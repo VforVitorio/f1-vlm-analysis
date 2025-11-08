@@ -41,9 +41,15 @@ practica_3_vlm/
 ├── README.md                 # This file
 ├── src/
 │   ├── __init__.py          # Package initialization
+│   ├── models/              # VLM model implementations
+│   │   ├── __init__.py
+│   │   ├── blip_model.py    # BLIP-base captioner class
+│   │   ├── moondream_model.py  # Moondream2 captioner class
+│   │   └── minicpm_model.py    # MiniCPM-V captioner class
+│   ├── vlm_inference.py     # Main orchestrator (handles --model arg)
 │   ├── dataset_loader.py    # Load F1 dataset with categories
-│   ├── vlm_inference.py     # VLM caption generation (3 models)
 │   ├── evaluation.py        # Metrics computation (BLEU, ROUGE, etc.)
+│   ├── comparison.py        # Cross-model comparative analysis
 │   └── utils.py             # Helper functions
 ├── dataset/                  # F1 dataset from practice 2
 │   ├── 1_drivers_emotions/  # Drivers celebrating, frustrated
@@ -75,8 +81,7 @@ practica_3_vlm/
 
 ## Dataset Structure
 
-> [!WARNING]
-> **Dataset Not Included**
+> [!WARNING] > **Dataset Not Included**
 >
 > The F1 image dataset is **NOT uploaded to this repository** due to size constraints.
 >
