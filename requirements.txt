@@ -5,12 +5,17 @@ torchvision==0.15.2
 # Hugging Face ecosystem
 transformers==4.35.0
 accelerate==0.24.1
-bitsandbytes==0.41.1  # For quantization support
+bitsandbytes==0.41.1  # For 4-bit quantization (MiniCPM-V)
+
+# Model-specific dependencies
+einops==0.7.0  # Required by Moondream2
+timm==0.9.12   # Required by BLIP and MiniCPM-V
 
 # Evaluation metrics
 evaluate==0.4.1
 nltk==3.8.1
 rouge-score==0.1.2
+sacrebleu==2.3.1  # Additional BLEU implementation
 
 # Image processing
 Pillow==10.1.0
@@ -19,6 +24,9 @@ Pillow==10.1.0
 numpy==1.24.3
 tqdm==4.66.1
 
-# Optional: For specific VLM models
-sentencepiece==0.1.99  # For some tokenizers
+# Tokenizers
+sentencepiece==0.1.99
 protobuf==4.24.4
+
+# Additional dependencies for VLMs
+safetensors==0.4.1  # For efficient model loading
