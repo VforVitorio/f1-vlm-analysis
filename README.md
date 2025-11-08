@@ -75,7 +75,8 @@ practica_3_vlm/
 
 ## Dataset Structure
 
-> [!WARNING] > **Dataset Not Included**
+> [!WARNING]
+> **Dataset Not Included**
 >
 > The F1 image dataset is **NOT uploaded to this repository** due to size constraints.
 >
