@@ -1,0 +1,24 @@
+# Core ML libraries
+torch==2.0.1
+torchvision==0.15.2
+
+# Hugging Face ecosystem
+transformers==4.35.0
+accelerate==0.24.1
+bitsandbytes==0.41.1  # For quantization support
+
+# Evaluation metrics
+evaluate==0.4.1
+nltk==3.8.1
+rouge-score==0.1.2
+
+# Image processing
+Pillow==10.1.0
+
+# Utilities
+numpy==1.24.3
+tqdm==4.66.1
+
+# Optional: For specific VLM models
+sentencepiece==0.1.99  # For some tokenizers
+protobuf==4.24.4
