@@ -136,5 +136,88 @@ def get_image_paths(dataset_dir):
     return image_paths_sorted
 
 # ============================================
-# Image Management Functions
+# Results Management Functions
 # ============================================
+
+
+def save_metrics(metrics, output_path):
+    """
+    Save evaluation metrics to JSON file.
+
+    Args:
+        metrics: Dictionary containing metrics names and values
+        output_path: Path where to save the metrics JSON file
+    """
+
+    output_dir = Path(output_path).parent
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(metrics, f, indent=2, ensure_ascii=False)
+
+
+def load_metrics(metrics_path):
+    """
+    Load metrics from JSON file.
+
+    Args:
+        metrics_path: Path to metrics JSON file
+
+    Returns:
+        Dictionary with metric names and values
+    """
+
+    with open(metrics_path, "r", encoding="utf-8") as f:
+        metrics = json.load(f)
+
+    return metrics
+
+
+def ensure_output_dir(output_dir):
+    """
+    Create output directory if it does not exist.
+
+    Args:
+        output_dir: Path to directory to create
+    """
+
+    output_path = Path(output_dir)
+    output_path.mkdir(parents=True, ensure_ok=True)
+
+
+# ============================================
+# Display Utilities
+# ============================================
+
+def print_progress(current, total, image_name):
+    """
+    Display progress of image processing.
+
+
+    Args:
+        current: Current image number being processed
+        total: Total number of images
+        image_name: Name of current image file
+    """
+
+    print(f"Processing image {current}/{total}: {image_name}")
+
+
+def print_metrics_summary(metrics):
+    """
+    Print evaluation metrics in formatted table.
+
+    Args:
+        metrics: Dictionary containing metric names and values
+    """
+    print("\n" + "="*60)
+    print("EVALUATION METRICS")
+    print("="*60)
+
+    for metric_name, metric_value in metrics.items():
+        if isinstance(metric_value, float):
+            print(f"{metric_name:20s}: {metric_value:.4f}")
+        else:
+            print(f"{metric_name:20s}: {metric_value}")
+
+    print("="*60 + "\n")
