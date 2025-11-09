@@ -134,3 +134,7 @@ def get_image_paths(dataset_dir):
     image_paths_sorted = sorted(image_paths_list)
 
     return image_paths_sorted
+
+# ============================================
+# Image Management Functions
+# ============================================
