@@ -8,9 +8,11 @@ Speed: ~1-2 seconds/image
 """
 
 import torch
-from PIL import Image
 from pathlib import Path
 from transformers import BlipProcessor, BlipForConditionalGeneration
+import sys
+sys.path.append(str(Path(__file__).parent.parent))
+from utils import load_image, clear_gpu_cache
 
 
 # ============================================
@@ -66,7 +68,7 @@ class BLIPModel:
             str: Generated caption
         """
         # Load image
-        image = self._load_image(image_path)
+        image = load_image(image_path)
 
         # Preprocess image
         inputs = self.processor(images=image, return_tensors="pt")
@@ -111,7 +113,7 @@ class BLIPModel:
             # Load images for this batch
             batch_images = []
             for path in batch_paths:
-                image = self._load_image(path)
+                image = load_image(path)
                 batch_images.append(image)
 
             # Preprocess batch
@@ -136,25 +138,11 @@ class BLIPModel:
 
         return all_captions
 
-    def _load_image(self, image_path):
-        """
-        Load image from path.
-
-        Args:
-            image_path: Path to image file
-
-        Returns:
-            PIL.Image: Loaded image in RGB format
-        """
-        image = Image.open(image_path).convert('RGB')
-        return image
-
     def clear_cache(self):
         """
         Clear GPU cache to free up VRAM.
         """
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
+        clear_gpu_cache()
 
 
 # ============================================
