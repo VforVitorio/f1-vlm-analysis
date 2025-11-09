@@ -221,3 +221,35 @@ def print_metrics_summary(metrics):
             print(f"{metric_name:20s}: {metric_value}")
 
     print("="*60 + "\n")
+
+
+# ============================================
+# Device Utilities
+# ============================================
+
+def get_device():
+    """
+    Detect and return available device for inference.
+
+    Returns:
+        torch.device object (cuda or cpu)
+    """
+    device = torch.device(DEFAULT_DEVICE)
+
+    if DEFAULT_DEVICE == 'cuda':
+        print(f"Using GPU: {torch.cuda.get_device_name(0)}")
+    else:
+        print("Using CPU")
+
+    return device
+
+
+def clear_gpu_cache():
+    """
+    Clear GPU memory cache to free up VRAM.
+
+    Useful when switching between models or after inference.
+    """
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+        print("GPU cache cleared")
