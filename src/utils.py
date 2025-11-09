@@ -13,7 +13,7 @@ This module provides helper functions for:
 import json
 import torch
 from pathlib import Path
-from PIL import image
+from PIL import Image
 from typing import Dict, List, Tuple, Any
 
 
@@ -94,3 +94,43 @@ def format_captions_for_evaluation(ground_truth_data, generated_captions):
 # ============================================
 # Image Management Functions
 # ============================================
+
+def load_image(image_path):
+    """
+    Load image from file as PIL Image.
+
+    Args:
+        image_path: Path to the image file
+
+    Returns:
+        PIL IMage object in RGB mode
+
+    """
+
+    image = Image.open(image_path).convert("RGB")
+
+    return image
+
+
+def get_image_paths(dataset_dir):
+    """
+    Get all image file paths from dataset directory.
+
+    Searches recursively through all subdirectories for .jpg files.
+
+    Args:
+        dataset_dir: Path to dataset root directory
+
+    Returns:
+        Sorted list of image file paths as strings
+    """
+    dataset_path = Path(dataset_dir)
+
+    # Find all .jpg files recursively
+    image_paths = dataset_path.rglob(f'*.{IMAGE_EXTENSION}')
+
+    # Convert to strings and sort
+    image_paths_list = [str(path) for path in image_paths]
+    image_paths_sorted = sorted(image_paths_list)
+
+    return image_paths_sorted
