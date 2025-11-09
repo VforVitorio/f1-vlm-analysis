@@ -19,6 +19,9 @@ with fields: id, category, filename, caption.
 import json
 from pathlib import Path
 from typing import Dict, List
+import sys
+sys.path.append(str(Path(__file__).parent))
+from utils import get_image_paths
 
 
 # ============================================
@@ -135,12 +138,4 @@ def get_all_image_paths(dataset_path):
     Returns:
         list: All image paths sorted
     """
-    dataset_path = Path(dataset_path)
-
-    all_paths = []
-    for category in CATEGORIES:
-        category_images = get_images_by_category(dataset_path, category)
-        all_paths.extend(category_images)
-
-    all_paths.sort()
-    return all_paths
+    return get_image_paths(dataset_path)
