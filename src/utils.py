@@ -28,31 +28,15 @@ DEFAULT_DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 # Caption Management Functions
 # ============================================
 
-def load_captions_json(json_path):
-    """
-    Load captions from JSON file
-    Args:
-        json_path: Path to captions.json file
-
-    Returns:
-        Dictionary with image data including captions
-    """
-
-    with open(json_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    return data
-
-
 def save_captions_json(captions, output_path):
     """
     Save generated captions from the VLMs to JSON file.
 
-    Args: 
+    Args:
         captions: Dictionary mapping image filenames to generated captions
         output_path: Path where to save the JSON file
     """
-    output_dir = Path(output_path).parent
-    output_dir.mkdir(parents=True, exist_ok=True)
+    ensure_output_dir(Path(output_path).parent)
 
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(captions, f, indent=2, ensure_ascii=False)
@@ -148,9 +132,7 @@ def save_metrics(metrics, output_path):
         metrics: Dictionary containing metrics names and values
         output_path: Path where to save the metrics JSON file
     """
-
-    output_dir = Path(output_path).parent
-    output_dir.mkdir(parents=True, exist_ok=True)
+    ensure_output_dir(Path(output_path).parent)
 
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(metrics, f, indent=2, ensure_ascii=False)
@@ -182,7 +164,7 @@ def ensure_output_dir(output_dir):
     """
 
     output_path = Path(output_dir)
-    output_path.mkdir(parents=True, ensure_ok=True)
+    output_path.mkdir(parents=True, exist_ok=True)
 
 
 # ============================================
