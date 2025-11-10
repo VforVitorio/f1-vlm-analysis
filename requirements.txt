@@ -1,6 +1,6 @@
 # Core ML libraries
 torch==2.0.1
-torchvision==0.15.2
+torchvision==0.16.0
 
 # Hugging Face ecosystem
 transformers==4.35.0
