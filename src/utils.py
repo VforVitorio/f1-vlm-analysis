@@ -226,6 +226,28 @@ def get_device():
     return device
 
 
+def get_device_from_arg(device):
+    """
+    Convert device argument to torch.device object.
+
+    If device is None, auto-detect CUDA availability.
+    Used by model initialization to standardize device handling.
+
+    Args:
+        device: torch device ('cuda', 'cpu', or None for auto-detect)
+
+    Returns:
+        torch.device object
+    """
+    if device is None:
+        if torch.cuda.is_available():
+            return torch.device('cuda')
+        else:
+            return torch.device('cpu')
+    else:
+        return torch.device(device)
+
+
 def clear_gpu_cache():
     """
     Clear GPU memory cache to free up VRAM.

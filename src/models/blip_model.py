@@ -12,7 +12,7 @@ from pathlib import Path
 from transformers import BlipProcessor, BlipForConditionalGeneration
 import sys
 sys.path.append(str(Path(__file__).parent.parent))
-from utils import load_image, clear_gpu_cache
+from utils import load_image, clear_gpu_cache, get_device_from_arg
 
 
 # ============================================
@@ -38,13 +38,8 @@ class BLIPModel:
         Args:
             device: torch device ('cuda' or 'cpu'). Auto-detect if None.
         """
-        if device is None:
-            if torch.cuda.is_available():
-                self.device = torch.device('cuda')
-            else:
-                self.device = torch.device('cpu')
-        else:
-            self.device = torch.device(device)
+        # Get device using utils function
+        self.device = get_device_from_arg(device)
 
         print(f"Loading BLIP model on {self.device}...")
 
