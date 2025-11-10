@@ -29,23 +29,12 @@ from models.blip_model import create_blip_model
 
 import utils
 import dataset_loader
-
-
-# ============================================
-# Constants
-# ============================================
-DATASET_PATH = "dataset"
-RESULTS_BASE_PATH = "results"
-
-AVAILABLE_MODELS = ["blip", "moondream", "minicpm"]
-
-MODEL_RESULTS_PATHS = {
-    "blip": "results/blip",
-    "moondream": "results/moondream",
-    "minicpm": "results/minicpm"
-}
-
-OUTPUT_FILENAME = "generated_captions.json"
+from constants import (
+    DATASET_PATH,
+    AVAILABLE_MODELS,
+    MODEL_RESULTS_PATHS,
+    GENERATED_CAPTIONS_FILENAME
+)
 
 # ============================================
 # Model Management Functions
@@ -202,7 +191,7 @@ def run_single_model(model_name):
 
     # Prepare output path
     output_dir = MODEL_RESULTS_PATHS[model_name]
-    output_path = Path(output_dir) / OUTPUT_FILENAME
+    output_path = Path(output_dir) / GENERATED_CAPTIONS_FILENAME
 
     # Save results (ensure_output_dir is called internally)
     utils.save_captions_json(captions, str(output_path))
