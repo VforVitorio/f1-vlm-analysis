@@ -24,8 +24,8 @@ from typing import Dict, List
 
 # Local imports
 from models.blip_model import create_blip_model
-# from models.moondream_model import create_moondream_model  # TODO: Implement
-# from models.minicpm_model import create_minicpm_model      # TODO: Implement
+from models.moondream_model import create_moondream_model
+from models.minicpm_model import create_minicpm_model
 
 import utils
 import dataset_loader
@@ -57,9 +57,9 @@ def create_model(model_name):
     if model_name == "blip":
         return create_blip_model()
     elif model_name == "moondream":
-        return create_moondream_model()  # TODO: implement
+        return create_moondream_model()
     elif model_name == "minicpm":
-        return create_minicpm_model()  # TODO: implement
+        return create_minicpm_model()
     else:
         raise ValueError(
             f"Unknown model: {model_name}. Available: {AVAILABLE_MODELS}")
