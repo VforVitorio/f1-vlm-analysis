@@ -1,4 +1,4 @@
-IMAGE := vlm-captioning
+IMAGE := f1-vlm-analysis
 
 build:
 	docker build -t $(IMAGE) .
