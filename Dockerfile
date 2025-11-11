@@ -2,7 +2,7 @@
 # VLM Image Captioning - Dockerfile
 # ==============================================================================
 # Multi-model VLM system for F1 dataset captioning
-# Models: BLIP-base, Moondream2, MiniCPM-V 2.0
+# Models: BLIP-base, GIT-base, InstructBLIP, Phi-3-Vision
 # Target GPU: GTX 1050 (4GB VRAM)
 # ==============================================================================
 
@@ -49,8 +49,9 @@ COPY src/ ./src/
 # Create directories
 RUN mkdir -p /app/.cache/huggingface \
     results/blip \
-    results/moondream \
-    results/minicpm \
+    results/git-base \
+    results/instructblip \
+    results/phi3-vision \
     results/comparison
 
 # Volume Mount Points
