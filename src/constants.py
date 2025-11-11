@@ -14,13 +14,13 @@ RESULTS_BASE_PATH = "results"
 # ============================================
 # Model Configuration
 # ============================================
-AVAILABLE_MODELS = ["blip", "git-base", "instructblip", "phi3-vision"]
+AVAILABLE_MODELS = ["blip", "git-base", "vit2distilgpt2", "swin-tiny"]
 
 MODEL_RESULTS_PATHS = {
     "blip": "results/blip",
     "git-base": "results/git-base",
-    "instructblip": "results/instructblip",
-    "phi3-vision": "results/phi3-vision"
+    "vit2distilgpt2": "results/vit2distilgpt2",
+    "swin-tiny": "results/swin-tiny"
 }
 
 # ============================================
