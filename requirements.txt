@@ -1,32 +1,30 @@
-# Core ML libraries
-torch==2.0.1
-torchvision==0.15.2
+# PyTorch CUDA 11.8
+torch==2.1.2
+torchvision==0.16.2
 
-# Hugging Face ecosystem
-transformers==4.35.0
-accelerate==0.24.1
-bitsandbytes==0.41.1  # For 4-bit quantization (MiniCPM-V)
+# Hugging Face++
+transformers==4.40.0
+accelerate==0.30.1
+bitsandbytes==0.43.1
 
-# Model-specific dependencies
-einops==0.7.0  # Required by Moondream2
-timm==0.9.12   # Required by BLIP and MiniCPM-V
+# Vision / model utils
+einops==0.7.0
+timm==0.9.12
 
-# Evaluation metrics
+# Metrics
 evaluate==0.4.1
 nltk==3.8.1
 rouge-score==0.1.2
-sacrebleu==2.3.1  # Additional BLEU implementation
+sacrebleu==2.3.1
 
-# Image processing
+# Images / utils
 Pillow==10.1.0
-
-# Utilities
 numpy==1.24.3
 tqdm==4.66.1
 
-# Tokenizers
+# Text / tokenization
 sentencepiece==0.1.99
-protobuf==4.24.4
+protobuf==3.20.3
 
-# Additional dependencies for VLMs
-safetensors==0.4.1  # For efficient model loading
+# Model serialization
+safetensors==0.4.1
