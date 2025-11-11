@@ -2,15 +2,16 @@
 VLM Inference - Main orchestrator for image captioning
 
 This module handles the complete inference pipeline:
-- CLI argument parsing (--model blip/moondream/minicpm or --all)
+- CLI argument parsing (--model blip/git-base/instructblip/phi3-vision or --all)
 - Model loading and initialization
 - Dataset processing and caption generation
 - Results saving to JSON format
 
 Usage:
     python src/vlm_inference.py --model blip
-    python src/vlm_inference.py --model moondream
-    python src/vlm_inference.py --model minicpm
+    python src/vlm_inference.py --model git-base
+    python src/vlm_inference.py --model instructblip
+    python src/vlm_inference.py --model phi3-vision
     python src/vlm_inference.py --all
 
 The module coordinates between model implementations, dataset loading,
@@ -24,8 +25,9 @@ from typing import Dict, List
 
 # Local imports
 from models.blip_model import create_blip_model
-from models.moondream_model import create_moondream_model
-from models.minicpm_model import create_minicpm_model
+from models.git_base_model import create_git_base_model
+from models.instructblip_model import create_instructblip_model
+from models.phi3_vision_model import create_phi3_vision_model
 
 import utils
 import dataset_loader
@@ -46,7 +48,7 @@ def create_model(model_name):
     Factory function to create model instance based on name.
 
     Args:
-        model_name: Name of the model ("blip", "moondream" or "minicpm")
+        model_name: Name of the model ("blip", "git-base", "instructblip", "phi3-vision")
     Returns:
         Model instance with generate_caption() method
 
@@ -56,10 +58,12 @@ def create_model(model_name):
 
     if model_name == "blip":
         return create_blip_model()
-    elif model_name == "moondream":
-        return create_moondream_model()
-    elif model_name == "minicpm":
-        return create_minicpm_model()
+    elif model_name == "git-base":
+        return create_git_base_model()
+    elif model_name == "instructblip":
+        return create_instructblip_model()
+    elif model_name == "phi3-vision":
+        return create_phi3_vision_model()
     else:
         raise ValueError(
             f"Unknown model: {model_name}. Available: {AVAILABLE_MODELS}")
@@ -122,6 +126,7 @@ def get_relative_path(image_path, dataset_path):
 # ============================================
 # Caption Generation Functions
 # ============================================
+
 
 def process_all_images(model, image_paths, dataset_path):
     """
@@ -232,7 +237,7 @@ def parse_arguments():
     Parse command line arguments.
 
     Supports two modes:
-    - Single model: --model {blip, moondream, minicpm}
+    - Single model: --model {blip, git-base, instructblip, phi3-vision}
     - All models: --all
 
     Returns:
