@@ -1,10 +1,10 @@
 # Practice 3: VLM Image Captioning
 
-Vision-Language Model (VLM) based image captioning system for Formula 1 dataset comparing four different architectures.
+Vision-Language Model (VLM) based image captioning system for Formula 1 dataset comparing four ultra-lightweight architectures with prompt tuning support.
 
 ## Models Used
 
-This project implements and compares **four VLM architectures** optimized for 4GB VRAM:
+This project implements and compares **four VLM architectures** optimized for 4GB VRAM (GTX 1050):
 
 ### 1. BLIP-base (Baseline - No Prompts)
 
@@ -25,25 +25,27 @@ This project implements and compares **four VLM architectures** optimized for 4G
 - **Prompts** : ❌ No - Direct captioning only
 - **Note** : Excellent balance between speed and quality
 
-### 3. InstructBLIP (Prompt Tuning Capable) 🆕
+### 3. ViT2DistilGPT2 (Ultra-Lightweight + Prompts) ✨
 
-- **Model** : `Salesforce/instructblip-vicuna-7b`
-- **Size** : ~7B parameters (4-bit quantized to ~3.5GB)
-- **VRAM** : ~3-3.5GB with 4-bit quantization
-- **Purpose** : Instruction-based captioning with customizable prompts
-- **Speed** : ~2-3 seconds/image
-- **Prompts** : ✅ Yes - Accepts custom instruction prompts
-- **Note** : Perfect for prompt engineering experiments
+- **Model** : `sachin/vit2distilgpt2`
+- **Size** : ~0.2B parameters (~200MB)
+- **VRAM** : <1GB (FP16)
+- **Purpose** : Ultra-lightweight VisionEncoderDecoder with prompt tuning support
+- **Architecture** : ViT-base encoder + DistilGPT2 decoder
+- **Speed** : <1 second/image
+- **Prompts** : ✅ Yes - Custom prompts via decoder prefix
+- **Note** : Proven model with 24+ monthly downloads and 7 active Spaces on HF
 
-### 4. Phi-3-Vision (Efficient Prompt Tuning) 🆕
+### 4. Swin-Tiny-DistilGPT2 (Ultra-Lightweight + Prompts) ✨
 
-- **Model** : `microsoft/Phi-3-vision-128k-instruct`
-- **Size** : ~3.8B parameters (4-bit quantized to ~2.5GB)
-- **VRAM** : ~2.5-3GB with 4-bit quantization
-- **Purpose** : Microsoft's efficient multimodal model with strong instruction-following
-- **Speed** : ~1-2 seconds/image
-- **Prompts** : ✅ Yes - Highly flexible conversational prompts
-- **Note** : Best efficiency for prompt-based captioning
+- **Model** : `yesidcanoc/image-captioning-swin-tiny-distilgpt2`
+- **Size** : ~0.15B parameters (~150MB)
+- **VRAM** : <1GB (FP16)
+- **Purpose** : Ultra-lightweight with Swin Transformer architecture
+- **Architecture** : Swin-Tiny encoder + DistilGPT2 decoder
+- **Speed** : <1 second/image
+- **Prompts** : ✅ Yes - Custom prompts via decoder prefix
+- **Note** : Swin architecture provides better hierarchical feature learning than ViT
 
 ## Project Structure
 
@@ -59,8 +61,8 @@ practica_3_vlm/
 │   │   ├── __init__.py
 │   │   ├── blip_model.py    # BLIP-base captioner class
 │   │   ├── git_base_model.py  # GIT-base captioner class
-│   │   ├── instructblip_model.py  # InstructBLIP captioner class
-│   │   └── phi3_vision_model.py   # Phi-3-Vision captioner class
+│   │   ├── vit2distilgpt2_model.py  # ViT2DistilGPT2 captioner class
+│   │   └── swin_tiny_model.py   # Swin-Tiny-DistilGPT2 captioner class
 │   ├── vlm_inference.py     # Main orchestrator (handles --model arg)
 │   ├── dataset_loader.py    # Load F1 dataset with categories
 │   ├── evaluation.py        # Metrics computation (BLEU, ROUGE, etc.)
@@ -87,10 +89,10 @@ practica_3_vlm/
     ├── git-base/            # GIT-base results
     │   ├── generated_captions.json
     │   └── metrics.json
-    ├── instructblip/        # InstructBLIP results
+    ├── vit2distilgpt2/      # ViT2DistilGPT2 results
     │   ├── generated_captions.json
     │   └── metrics.json
-    ├── phi3-vision/         # Phi-3-Vision results
+    ├── swin-tiny/           # Swin-Tiny-DistilGPT2 results
     │   ├── generated_captions.json
     │   └── metrics.json
     └── comparison/          # Cross-model comparison
@@ -177,20 +179,20 @@ This will:
 
 - Generate captions with BLIP-base
 - Generate captions with GIT-base
-- Generate captions with InstructBLIP
-- Generate captions with Phi-3-Vision
+- Generate captions with ViT2DistilGPT2
+- Generate captions with Swin-Tiny-DistilGPT2
 - Save results in separate folders per model
-- Total time: ~2-3 minutes for 20 images
+- Total time: <1.5 minutes for 20 images
 
 ### 3. Run Individual Models
 
 Run specific VLMs:
 
 ```bash
-make run-blip           # BLIP-base only (~30 seconds)
-make run-git-base       # GIT-base only (~20 seconds)
-make run-instructblip   # InstructBLIP only (~1 minute)
-make run-phi3-vision    # Phi-3-Vision only (~40 seconds)
+make run-blip            # BLIP-base only (~30 seconds)
+make run-git-base        # GIT-base only (~20 seconds)
+make run-vit2distilgpt2  # ViT2DistilGPT2 only (<20 seconds)
+make run-swin-tiny       # Swin-Tiny only (<20 seconds)
 ```
 
 ### 4. Evaluate Results
@@ -236,13 +238,13 @@ Opens a bash shell inside the container for interactive development and debuggin
 
 ## Expected Execution Times (GTX 1050)
 
-| Model        | Per Image | Full Dataset (20 images) |
-| ------------ | --------- | ------------------------ |
-| BLIP-base    | ~1-2s     | ~30-40s                  |
-| GIT-base     | ~1s       | ~20s                     |
-| InstructBLIP | ~2-3s     | ~40-60s                  |
-| Phi-3-Vision | ~1-2s     | ~30-40s                  |
-| **Total**    | -         | **~2-3 minutes**         |
+| Model                | Per Image | Full Dataset (20 images) |
+| -------------------- | --------- | ------------------------ |
+| BLIP-base            | ~1-2s     | ~30-40s                  |
+| GIT-base             | ~1s       | ~20s                     |
+| ViT2DistilGPT2       | <1s       | <20s                     |
+| Swin-Tiny-DistilGPT2 | <1s       | <20s                     |
+| **Total**            | -         | **<1.5 minutes**         |
 
 ## Evaluation Metrics
 
@@ -265,30 +267,30 @@ Results include:
 
 - Models run **sequentially**, not simultaneously
 - VRAM is freed between model executions
-- 4-bit quantization used for InstructBLIP and Phi-3-Vision
-- ~500MB safety margin maintained
+- Ultra-lightweight models (all <1GB) require no quantization
+- ~3GB safety margin maintained on 4GB GPU
 
 ### First Run
 
-- Model weights downloaded automatically (~8-10GB total for all models)
-- Download time depends on internet connection (~10-20 minutes first time)
+- Model weights downloaded automatically (~2GB total for all models)
+- Download time depends on internet connection (~5-10 minutes first time)
 - Weights cached for subsequent runs
 
 ### Model Selection Rationale
 
 - **BLIP-base**: Industry-standard baseline, fast, reliable, no prompts
 - **GIT-base**: Lightweight and efficient, excellent speed/quality balance, minimal VRAM usage, no prompts
-- **InstructBLIP**: Prompt tuning capable, instruction-based captioning, good for experiments
-- **Phi-3-Vision**: Efficient prompt tuning, Microsoft's latest multimodal model, best efficiency/capability ratio
+- **ViT2DistilGPT2**: Ultra-lightweight with prompt tuning via decoder prefix, proven in production (24+ downloads/month), ViT architecture
+- **Swin-Tiny-DistilGPT2**: Ultra-lightweight with prompt tuning, Swin Transformer for better hierarchical features, trained on COCO
 
 ### Quantization Strategy
 
 - **BLIP-base**: FP16 (native)
-- **GIT-base**: FP16 (native, CPU fallback)
-- **InstructBLIP**: 4-bit NF4 (aggressive quantization to fit 7B model)
-- **Phi-3-Vision**: 4-bit NF4 (optimal balance for 3.8B model)
+- **GIT-base**: FP16 (native)
+- **ViT2DistilGPT2**: FP16 (no quantization needed, <1GB)
+- **Swin-Tiny-DistilGPT2**: FP16 (no quantization needed, <1GB)
 
-### Tested Models (Memory Issues)
+### Tested Models (Memory/Loading Issues)
 
 During development, several models were tested but encountered loading or memory issues on GTX 1050 (4GB VRAM):
 
@@ -298,4 +300,8 @@ During development, several models were tested but encountered loading or memory
 
 - **Qwen2-VL-2B** (`Qwen/Qwen2-VL-2B-Instruct`): Loaded successfully but encountered CUDA Out of Memory error during inference. Model attempted to allocate 4.27GB on a 4GB GPU, failing at the 8th image. While promising, it exceeds the available VRAM.
 
-**Selected Alternatives**: InstructBLIP and Phi-3-Vision were chosen as prompt-capable alternatives that successfully fit within 4GB VRAM constraints while offering instruction-following capabilities.
+- **InstructBLIP** (`Salesforce/instructblip-vicuna-7b`): Model download/shard loading extremely slow. After ~1.5 hours, shards failed to load completely. The 7B model size appears too large for efficient loading even with 4-bit quantization on limited hardware.
+
+- **Phi-3-Vision** (`microsoft/Phi-3-vision-128k-instruct`): Shard loading timeout after ~16 minutes. Despite 4-bit quantization reducing the 3.8B model to ~2.5GB, the loading process failed to complete. Model hung during shard loading similar to InstructBLIP.
+
+**Selected Alternatives**: After extensive testing, ViT2DistilGPT2 and Swin-Tiny-DistilGPT2 were selected as the prompt-capable models. Both are ultra-lightweight (<0.2B parameters), load instantly, run in <1GB VRAM, and support prompt tuning through decoder prefix injection. Combined with BLIP-base and GIT-base, this provides a balanced comparison with two direct captioning models and two prompt-capable models, all working reliably on 4GB VRAM.
