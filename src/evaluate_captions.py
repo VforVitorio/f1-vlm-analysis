@@ -9,7 +9,9 @@ This module evaluates generated captions against ground truth using standard met
 
 Usage:
     python src/evaluate_captions.py --model blip
-    python src/evaluate_captions.py --model moondream
+    python src/evaluate_captions.py --model git-base
+    python src/evaluate_captions.py --model instructblip
+    python src/evaluate_captions.py --model phi3-vision
     python src/evaluate_captions.py --all                # evaluate all models
     python src/evaluate_captions.py --compare            # compare metrics across models
 
@@ -86,7 +88,7 @@ def load_generated_captions(model_name):
     Load generated captions for a specific model.
 
     Args:
-        model_name: Name of the model ("blip", "moondream", "minicpm")
+        model_name: Name of the model ("blip", "git-base", "instructblip", "phi3-vision")
 
     Returns:
         dict: Generated captions mapping filenames to captions
