@@ -15,17 +15,17 @@ run-git-base:
 		-w /opt/project \
 		$(IMAGE) python3 src/vlm_inference.py --model git-base
 
-run-instructblip:
+run-vit2distilgpt2:
 	docker run --rm --gpus all \
 		-v "$(PWD):/opt/project" \
 		-w /opt/project \
-		$(IMAGE) python3 src/vlm_inference.py --model instructblip
+		$(IMAGE) python3 src/vlm_inference.py --model vit2distilgpt2
 
-run-phi3-vision:
+run-swin-tiny:
 	docker run --rm --gpus all \
 		-v "$(PWD):/opt/project" \
 		-w /opt/project \
-		$(IMAGE) python3 src/vlm_inference.py --model phi3-vision
+		$(IMAGE) python3 src/vlm_inference.py --model swin-tiny
 
 run-all:
 	docker run --rm --gpus all \
@@ -45,17 +45,17 @@ evaluate-git-base:
 		-w /opt/project \
 		$(IMAGE) python3 src/evaluate_captions.py --model git-base
 
-evaluate-instructblip:
+evaluate-vit2distilgpt2:
 	docker run --rm --gpus all \
 		-v "$(PWD):/opt/project" \
 		-w /opt/project \
-		$(IMAGE) python3 src/evaluate_captions.py --model instructblip
+		$(IMAGE) python3 src/evaluate_captions.py --model vit2distilgpt2
 
-evaluate-phi3-vision:
+evaluate-swin-tiny:
 	docker run --rm --gpus all \
 		-v "$(PWD):/opt/project" \
 		-w /opt/project \
-		$(IMAGE) python3 src/evaluate_captions.py --model phi3-vision
+		$(IMAGE) python3 src/evaluate_captions.py --model swin-tiny
 
 evaluate-all:
 	docker run --rm --gpus all \
