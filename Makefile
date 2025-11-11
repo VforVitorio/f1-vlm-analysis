@@ -9,17 +9,23 @@ run-blip:
 		-w /opt/project \
 		$(IMAGE) python3 src/vlm_inference.py --model blip
 
-run-moondream:
+run-git-base:
 	docker run --rm --gpus all \
 		-v "$(PWD):/opt/project" \
 		-w /opt/project \
-		$(IMAGE) python3 src/vlm_inference.py --model moondream
+		$(IMAGE) python3 src/vlm_inference.py --model git-base
 
-run-minicpm:
+run-instructblip:
 	docker run --rm --gpus all \
 		-v "$(PWD):/opt/project" \
 		-w /opt/project \
-		$(IMAGE) python3 src/vlm_inference.py --model minicpm
+		$(IMAGE) python3 src/vlm_inference.py --model instructblip
+
+run-phi3-vision:
+	docker run --rm --gpus all \
+		-v "$(PWD):/opt/project" \
+		-w /opt/project \
+		$(IMAGE) python3 src/vlm_inference.py --model phi3-vision
 
 run-all:
 	docker run --rm --gpus all \
@@ -33,17 +39,23 @@ evaluate-blip:
 		-w /opt/project \
 		$(IMAGE) python3 src/evaluate_captions.py --model blip
 
-evaluate-moondream:
+evaluate-git-base:
 	docker run --rm --gpus all \
 		-v "$(PWD):/opt/project" \
 		-w /opt/project \
-		$(IMAGE) python3 src/evaluate_captions.py --model moondream
+		$(IMAGE) python3 src/evaluate_captions.py --model git-base
 
-evaluate-minicpm:
+evaluate-instructblip:
 	docker run --rm --gpus all \
 		-v "$(PWD):/opt/project" \
 		-w /opt/project \
-		$(IMAGE) python3 src/evaluate_captions.py --model minicpm
+		$(IMAGE) python3 src/evaluate_captions.py --model instructblip
+
+evaluate-phi3-vision:
+	docker run --rm --gpus all \
+		-v "$(PWD):/opt/project" \
+		-w /opt/project \
+		$(IMAGE) python3 src/evaluate_captions.py --model phi3-vision
 
 evaluate-all:
 	docker run --rm --gpus all \
