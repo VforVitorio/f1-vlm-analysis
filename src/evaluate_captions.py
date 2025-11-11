@@ -10,8 +10,8 @@ This module evaluates generated captions against ground truth using standard met
 Usage:
     python src/evaluate_captions.py --model blip
     python src/evaluate_captions.py --model git-base
-    python src/evaluate_captions.py --model instructblip
-    python src/evaluate_captions.py --model phi3-vision
+    python src/evaluate_captions.py --model vit2distilgpt2
+    python src/evaluate_captions.py --model swin-tiny
     python src/evaluate_captions.py --all                # evaluate all models
     python src/evaluate_captions.py --compare            # compare metrics across models
 
