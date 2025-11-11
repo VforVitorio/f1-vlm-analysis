@@ -1,35 +1,49 @@
 # Practice 3: VLM Image Captioning
 
-Vision-Language Model (VLM) based image captioning system for Formula 1 dataset comparing three different architectures.
+Vision-Language Model (VLM) based image captioning system for Formula 1 dataset comparing four different architectures.
 
 ## Models Used
 
-This project implements and compares **three VLM architectures** optimized for 4GB VRAM:
+This project implements and compares **four VLM architectures** optimized for 4GB VRAM:
 
-### 1. BLIP-base (Baseline)
+### 1. BLIP-base (Baseline - No Prompts)
 
 - **Model** : `Salesforce/blip-image-captioning-base`
 - **Size** : ~450MB (FP16)
 - **VRAM** : ~1.5GB
 - **Purpose** : Establishes baseline performance with proven architecture
 - **Speed** : ~1-2 seconds/image
+- **Prompts** : ❌ No - Direct captioning only
 
-### 2. Moondream2 (Efficient)
+### 2. GIT-base (Efficient & Fast - No Prompts)
 
-- **Model** : `vikhyatk/moondream2`
-- **Size** : ~1.6B parameters
-- **VRAM** : ~1.5-2GB
-- **Purpose** : Modern efficient VLM optimized for low-resource environments
+- **Model** : `microsoft/git-base`
+- **Size** : ~350MB
+- **VRAM** : ~1-2GB (perfect for GTX 1050)
+- **Purpose** : Lightweight and efficient model optimized for speed
+- **Speed** : ~1 second/image
+- **Prompts** : ❌ No - Direct captioning only
+- **Note** : Excellent balance between speed and quality
+
+### 3. InstructBLIP (Prompt Tuning Capable) 🆕
+
+- **Model** : `Salesforce/instructblip-vicuna-7b`
+- **Size** : ~7B parameters (4-bit quantized to ~3.5GB)
+- **VRAM** : ~3-3.5GB with 4-bit quantization
+- **Purpose** : Instruction-based captioning with customizable prompts
 - **Speed** : ~2-3 seconds/image
+- **Prompts** : ✅ Yes - Accepts custom instruction prompts
+- **Note** : Perfect for prompt engineering experiments
 
-### 3. MiniCPM-V 2.0 (Advanced)
+### 4. Phi-3-Vision (Efficient Prompt Tuning) 🆕
 
-- **Model** : `openbmb/MiniCPM-V-2`
-- **Size** : ~2.4B parameters (4-bit quantized)
-- **VRAM** : ~3GB
-- **Purpose** : State-of-the-art compact VLM with strong detail recognition
-- **Speed** : ~4-6 seconds/image
-- **Note** : Uses aggressive 4-bit quantization to fit in 4GB VRAM
+- **Model** : `microsoft/Phi-3-vision-128k-instruct`
+- **Size** : ~3.8B parameters (4-bit quantized to ~2.5GB)
+- **VRAM** : ~2.5-3GB with 4-bit quantization
+- **Purpose** : Microsoft's efficient multimodal model with strong instruction-following
+- **Speed** : ~1-2 seconds/image
+- **Prompts** : ✅ Yes - Highly flexible conversational prompts
+- **Note** : Best efficiency for prompt-based captioning
 
 ## Project Structure
 
@@ -44,8 +58,9 @@ practica_3_vlm/
 │   ├── models/              # VLM model implementations
 │   │   ├── __init__.py
 │   │   ├── blip_model.py    # BLIP-base captioner class
-│   │   ├── moondream_model.py  # Moondream2 captioner class
-│   │   └── minicpm_model.py    # MiniCPM-V captioner class
+│   │   ├── git_base_model.py  # GIT-base captioner class
+│   │   ├── instructblip_model.py  # InstructBLIP captioner class
+│   │   └── phi3_vision_model.py   # Phi-3-Vision captioner class
 │   ├── vlm_inference.py     # Main orchestrator (handles --model arg)
 │   ├── dataset_loader.py    # Load F1 dataset with categories
 │   ├── evaluation.py        # Metrics computation (BLEU, ROUGE, etc.)
@@ -69,10 +84,13 @@ practica_3_vlm/
     ├── blip/                # BLIP-base results
     │   ├── generated_captions.json
     │   └── metrics.json
-    ├── moondream/           # Moondream2 results
+    ├── git-base/            # GIT-base results
     │   ├── generated_captions.json
     │   └── metrics.json
-    ├── minicpm/             # MiniCPM-V results
+    ├── instructblip/        # InstructBLIP results
+    │   ├── generated_captions.json
+    │   └── metrics.json
+    ├── phi3-vision/         # Phi-3-Vision results
     │   ├── generated_captions.json
     │   └── metrics.json
     └── comparison/          # Cross-model comparison
@@ -149,7 +167,7 @@ make build
 
 ### 2. Generate Captions with All Models
 
-Run all three VLMs sequentially:
+Run all four VLMs sequentially:
 
 ```bash
 make run-all
@@ -158,19 +176,21 @@ make run-all
 This will:
 
 - Generate captions with BLIP-base
-- Generate captions with Moondream2
-- Generate captions with MiniCPM-V 2.0
+- Generate captions with GIT-base
+- Generate captions with InstructBLIP
+- Generate captions with Phi-3-Vision
 - Save results in separate folders per model
-- Total time: ~3-5 minutes for 20 images
+- Total time: ~2-3 minutes for 20 images
 
 ### 3. Run Individual Models
 
 Run specific VLMs:
 
 ```bash
-make run-blip        # BLIP-base only (~30 seconds)
-make run-moondream   # Moondream2 only (~1 minute)
-make run-minicpm     # MiniCPM-V only (~2 minutes)
+make run-blip           # BLIP-base only (~30 seconds)
+make run-git-base       # GIT-base only (~20 seconds)
+make run-instructblip   # InstructBLIP only (~1 minute)
+make run-phi3-vision    # Phi-3-Vision only (~40 seconds)
 ```
 
 ### 4. Evaluate Results
@@ -216,12 +236,13 @@ Opens a bash shell inside the container for interactive development and debuggin
 
 ## Expected Execution Times (GTX 1050)
 
-| Model         | Per Image | Full Dataset (20 images) |
-| ------------- | --------- | ------------------------ |
-| BLIP-base     | ~1-2s     | ~30-40s                  |
-| Moondream2    | ~2-3s     | ~40-60s                  |
-| MiniCPM-V 2.0 | ~4-6s     | ~80-120s                 |
-| **Total**     | -         | **~3-4 minutes**         |
+| Model        | Per Image | Full Dataset (20 images) |
+| ------------ | --------- | ------------------------ |
+| BLIP-base    | ~1-2s     | ~30-40s                  |
+| GIT-base     | ~1s       | ~20s                     |
+| InstructBLIP | ~2-3s     | ~40-60s                  |
+| Phi-3-Vision | ~1-2s     | ~30-40s                  |
+| **Total**    | -         | **~2-3 minutes**         |
 
 ## Evaluation Metrics
 
@@ -242,25 +263,39 @@ Results include:
 
 ### VRAM Management
 
-- Models run **sequentially** , not simultaneously
+- Models run **sequentially**, not simultaneously
 - VRAM is freed between model executions
-- 4-bit quantization used for MiniCPM-V to fit in 4GB
+- 4-bit quantization used for InstructBLIP and Phi-3-Vision
 - ~500MB safety margin maintained
 
 ### First Run
 
-- Model weights downloaded automatically (~3-4GB total)
-- Download time depends on internet connection (~5-10 minutes)
+- Model weights downloaded automatically (~8-10GB total for all models)
+- Download time depends on internet connection (~10-20 minutes first time)
 - Weights cached for subsequent runs
 
 ### Model Selection Rationale
 
-- **BLIP** : Industry-standard baseline, fast, reliable
-- **Moondream2** : Efficient modern architecture, good speed/quality balance
-- **MiniCPM-V** : Best quality within VRAM constraints, detailed descriptions
+- **BLIP-base**: Industry-standard baseline, fast, reliable, no prompts
+- **GIT-base**: Lightweight and efficient, excellent speed/quality balance, minimal VRAM usage, no prompts
+- **InstructBLIP**: Prompt tuning capable, instruction-based captioning, good for experiments
+- **Phi-3-Vision**: Efficient prompt tuning, Microsoft's latest multimodal model, best efficiency/capability ratio
 
 ### Quantization Strategy
 
-- BLIP-base: FP16 (native)
-- Moondream2: FP16 (native)
-- MiniCPM-V: 4-bit (aggressive, necessary for 4GB limit)
+- **BLIP-base**: FP16 (native)
+- **GIT-base**: FP16 (native, CPU fallback)
+- **InstructBLIP**: 4-bit NF4 (aggressive quantization to fit 7B model)
+- **Phi-3-Vision**: 4-bit NF4 (optimal balance for 3.8B model)
+
+### Tested Models (Memory Issues)
+
+During development, several models were tested but encountered loading or memory issues on GTX 1050 (4GB VRAM):
+
+- **MiniCPM-V 2.0** (`openbmb/MiniCPM-Llama3-V-2_5`): Failed to load within VRAM constraints despite 4-bit quantization. Model hung during initialization after ~1 hour of waiting.
+
+- **Moondream2** (`vikhyatk/moondream2`): Memory initialization issues prevented proper loading. Incompatibility with current transformers version.
+
+- **Qwen2-VL-2B** (`Qwen/Qwen2-VL-2B-Instruct`): Loaded successfully but encountered CUDA Out of Memory error during inference. Model attempted to allocate 4.27GB on a 4GB GPU, failing at the 8th image. While promising, it exceeds the available VRAM.
+
+**Selected Alternatives**: InstructBLIP and Phi-3-Vision were chosen as prompt-capable alternatives that successfully fit within 4GB VRAM constraints while offering instruction-following capabilities.
