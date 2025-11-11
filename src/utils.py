@@ -111,7 +111,7 @@ def get_image_paths(dataset_dir):
     dataset_path = Path(dataset_dir)
 
     # Find all .jpg files recursively
-    image_paths = dataset_path.rglob(f'*.{IMAGE_EXTENSION}')
+    image_paths = dataset_path.rglob(f'*{IMAGE_EXTENSION}')
 
     # Convert to strings and sort
     image_paths_list = [str(path) for path in image_paths]
