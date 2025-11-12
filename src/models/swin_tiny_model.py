@@ -1,5 +1,5 @@
 """
-Swin-Tiny-DistilGPT2 model wrapper for image captioning.
+Swin-Tiny-DistilGPT2 model wrapper for image captioning with prompt tuning support.
 
 Model: yesidcanoc/image-captioning-swin-tiny-distilgpt2
 Size: ~0.15B parameters (~150MB)
@@ -7,19 +7,17 @@ VRAM: <1GB (FP16)
 Speed: <1 second/image
 
 VisionEncoderDecoder model with Swin-Tiny encoder + DistilGPT2 decoder.
-Ultra-lightweight with Swin Transformer architecture for hierarchical features.
+Ultra-lightweight with Swin Transformer architecture, supports custom prompts.
 """
 
-import warnings
+from utils import load_image, clear_gpu_cache, get_device_from_arg
 import torch
-from transformers import VisionEncoderDecoderModel, AutoImageProcessor, AutoTokenizer
 from pathlib import Path
+from transformers import VisionEncoderDecoderModel, AutoImageProcessor, AutoTokenizer
 import sys
 
 # Add parent directory to path for local imports
 sys.path.append(str(Path(__file__).parent.parent))
-
-from utils import load_image, clear_gpu_cache, get_device_from_arg
 
 
 # ============================================
