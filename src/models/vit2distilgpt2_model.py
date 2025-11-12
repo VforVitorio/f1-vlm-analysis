@@ -58,8 +58,9 @@ class ViT2DistilGPT2Model:
         self.model = VisionEncoderDecoderModel.from_pretrained(MODEL_NAME)
         self.model.to(self.device)
 
-        # Load image processor (ViT feature extractor)
-        self.image_processor = ViTImageProcessor.from_pretrained(MODEL_NAME)
+        # Load image processor from ViT base (the encoder model)
+        # sachin/vit2distilgpt2 doesn't have preprocessor_config.json
+        self.image_processor = ViTImageProcessor.from_pretrained("google/vit-base-patch16-224-in21k")
 
         # Load tokenizer (DistilGPT2)
         self.tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
