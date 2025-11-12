@@ -2,22 +2,55 @@
 
 Vision-Language Model (VLM) based image captioning system for Formula 1 dataset comparing three ultra-lightweight architectures.
 
+## VLM Architecture Overview
+
+This project uses **first-generation VLMs** (VisionEncoderDecoder architecture, 2021-2022 era) optimized for low VRAM environments. These differ fundamentally from modern LLM-based multimodal models:
+
+### 🔹 First-Gen VLMs (Used in This Project)
+
+**Architecture**: `Vision Encoder → Cross-Attention → Language Decoder`
+
+- **Training**: Image-to-text on COCO with simple captions
+- **Capability**: Generate descriptions from images
+- **Prompting**: Limited - only short semantic primes (2-5 words)
+- **VRAM**: Very low (<2GB), perfect for GTX 1050
+- **Examples**: BLIP, GIT, Swin-Tiny, ViT-GPT2
+
+**Limitations**: Cannot follow complex instructions, no reasoning capabilities, prompts must be minimal.
+
+### 🔹 Modern LLM-based VLMs (Failed on 4GB VRAM)
+
+**Architecture**: `Vision Encoder → Projection → LLM (Llama/Qwen/Phi)`
+
+- **Training**: Instruction tuning with multimodal dialogues
+- **Capability**: Follow instructions, reasoning, Q&A, chat
+- **Prompting**: Full natural language instructions
+- **VRAM**: High (>4GB even with quantization)
+- **Examples**: Qwen2-VL, Phi-3-Vision, InstructBLIP, MiniCPM-V
+
+**Why They Failed**: Models like Qwen2-VL (OOM at 4.27GB), Phi-3-Vision (shard loading timeout), and InstructBLIP (failed to load after 1.5 hours) require significantly more VRAM and computational resources than available on GTX 1050.
+
+---
+
 ## Models Used
 
-This project implements and compares **three VLM architectures** optimized for 4GB VRAM (GTX 1050):
+This project implements and compares **three first-generation VLM architectures** optimized for 4GB VRAM (GTX 1050):
 
 ### 1. BLIP-base (Baseline - No Prompts)
 
 - **Model** : `Salesforce/blip-image-captioning-base`
+- **Architecture**: ViT encoder + BERT decoder (VisionEncoderDecoder)
 - **Size** : ~450MB (FP16)
 - **VRAM** : ~1.5GB
 - **Purpose** : Establishes baseline performance with proven architecture
 - **Speed** : ~1-2 seconds/image
 - **Prompts** : ❌ No - Direct captioning only
+- **Generation**: COCO-trained, deterministic beam search
 
 ### 2. GIT-base (Efficient & Fast - No Prompts)
 
 - **Model** : `microsoft/git-base`
+- **Architecture**: ViT encoder + GPT-2 decoder (VisionEncoderDecoder)
 - **Size** : ~350MB
 - **VRAM** : ~1-2GB (perfect for GTX 1050)
 - **Purpose** : Lightweight and efficient model optimized for speed
@@ -25,16 +58,18 @@ This project implements and compares **three VLM architectures** optimized for 4
 - **Prompts** : ❌ No - Direct captioning only
 - **Note** : Excellent balance between speed and quality
 
-### 3. Swin-Tiny-DistilGPT2 (Ultra-Lightweight + Prompts) ✨
+### 3. Swin-Tiny-DistilGPT2 (Ultra-Lightweight) ⚠️
 
 - **Model** : `yesidcanoc/image-captioning-swin-tiny-distilgpt2`
+- **Architecture** : Swin-Tiny encoder + DistilGPT2 decoder (VisionEncoderDecoder)
 - **Size** : ~0.15B parameters (~150MB)
 - **VRAM** : <1GB (FP16)
-- **Purpose** : Ultra-lightweight with Swin Transformer architecture
-- **Architecture** : Swin-Tiny encoder + DistilGPT2 decoder
+- **Purpose** : Experimental model to test Swin Transformer architecture vs ViT
 - **Speed** : <1 second/image
-- **Prompts** : ✅ Yes - Custom prompts via decoder prefix
-- **Note** : Swin architecture provides better hierarchical feature learning than ViT
+- **Prompts** : ❌ No - Direct captioning only
+- **Result** : ⚠️ **Poor quality on F1 dataset** - Generates generic COCO captions unrelated to racing context
+- **Note** : Included as negative control experiment. Despite same VisionEncoderDecoder architecture as BLIP/GIT, this specific checkpoint produces irrelevant captions (baseball players, tennis racquets, motorcycles instead of F1 cars). Demonstrates that **model checkpoint quality matters more than architecture** - not all VisionEncoderDecoder models trained on COCO generalize equally well to domain-specific datasets.
+- **Prompt Tuning Attempt**: Extensively tested category-specific prompts via `decoder_input_ids` prefix injection (both long instructions and short semantic primes). All approaches caused severe output degradation - model interprets prompts as literal caption beginnings, generating nonsensical text like "emotioning MOTORCYCLE PLAYING TENNIS" or "stop scene with orange dolls". VisionEncoderDecoder architecture technically supports decoder prefixes, but this specific checkpoint was not trained for it. Reverted to direct generation for coherent output.
 
 ## Project Structure
 
@@ -221,12 +256,14 @@ Opens a bash shell inside the container for interactive development and debuggin
 
 ## Expected Execution Times (GTX 1050)
 
-| Model                | Per Image | Full Dataset (20 images) |
-| -------------------- | --------- | ------------------------ |
-| BLIP-base            | ~1-2s     | ~30-40s                  |
-| GIT-base             | ~1s       | ~20s                     |
-| Swin-Tiny-DistilGPT2 | <1s       | <20s                     |
-| **Total**            | -         | **<1 minute**            |
+| Model                | Per Image | Full Dataset (20 images) | Quality |
+| -------------------- | --------- | ------------------------ | ------- |
+| BLIP-base            | ~1-2s     | ~30-40s                  | ✅ Good |
+| GIT-base             | ~1s       | ~20s                     | ✅ Good |
+| Swin-Tiny-DistilGPT2 | <1s       | <20s                     | ❌ Poor |
+| **Total**            | -         | **<1 minute**            | -       |
+
+**Note**: Swin-Tiny executes successfully but produces low-quality captions irrelevant to F1 context (e.g., "baseball player", "tennis racquet"). Kept as experimental baseline to demonstrate checkpoint quality importance.
 
 ## Evaluation Metrics
 
@@ -245,6 +282,54 @@ Results include:
 
 ## Notes
 
+### Architecture Choice: Why First-Gen VLMs?
+
+This project uses **VisionEncoderDecoder models** (BLIP, GIT, Swin-Tiny) instead of modern LLM-based VLMs due to **VRAM constraints on GTX 1050 (4GB)**:
+
+**First-Gen VLMs (Used)**:
+
+- ✅ VRAM: <2GB per model
+- ✅ Load time: Instant (<10 seconds)
+- ✅ Inference: Very fast (<2s per image)
+- ❌ Limitation: Cannot follow instructions, no prompt tuning support
+- ❌ Limitation: Decoder prefix prompting degrades output quality
+
+**Modern LLM-based VLMs (Failed)**:
+
+- ❌ VRAM: >4GB even with 4-bit quantization
+- ❌ Load time: Extremely slow (timeouts after 16min-1.5hr)
+- ❌ Inference: OOM errors during generation
+- ✅ Advantage: Would support full instruction following (if hardware allowed)
+
+**Trade-off**: We sacrifice instruction-following and prompt tuning capabilities for reliability and speed on limited hardware. First-gen VLMs produce quality captions through direct image-to-text generation but cannot be guided with prompts or instructions.
+
+### Why Not Smaller Modern LLM-based VLMs?
+
+While there exist newer ultra-compact LLM-based VLMs (2-3B parameters) like **PaliGemma-3B**, **SmolVLM-Instruct (2B)**, **MobileVLM V2 (1.7B)**, or **LLaVA-Phi-3-mini**, they are **not viable for 4GB VRAM** due to fundamental resource constraints:
+
+**Physical VRAM Requirements (minimum for modern LLM-VLM)**:
+
+- Base LLM (1-2B params): ~2GB in 4-bit quantization
+- Vision Encoder (400-500M): ~400-500MB
+- Activation memory during inference: ~1-1.5GB overhead
+- **Total minimum**: ~3.5-4GB → **No safety margin on 4GB GPU**
+
+**Why They Fail in Practice**:
+
+- Qwen2-VL-2B tested: **OOM at 4.27GB** during 8th image
+- Phi-3-Vision-3.8B tested: **Shard loading timeout** after 16 minutes
+- Models with 2-3GB theoretical footprint **exceed 4GB during generation**
+- Quantization overhead + batch processing = instant crash
+- Extremely slow loading times (shards, quantization) = poor UX
+
+**First-Gen VLMs Comparison**:
+
+- BLIP/GIT/Swin-Tiny: <2GB per model, ~3GB free margin
+- Instant loading, stable inference, production-proven
+- Trade instruction-following for **100% reliability** on limited hardware
+
+**Conclusion**: For 4GB VRAM, first-gen VisionEncoderDecoder models are the **only practical choice**. Modern LLM-based VLMs require minimum 6-8GB VRAM for stable operation.
+
 ### VRAM Management
 
 - Models run **sequentially**, not simultaneously
@@ -260,9 +345,13 @@ Results include:
 
 ### Model Selection Rationale
 
-- **BLIP-base**: Industry-standard baseline, fast, reliable, no prompts
-- **GIT-base**: Lightweight and efficient, excellent speed/quality balance, minimal VRAM usage, no prompts
-- **Swin-Tiny-DistilGPT2**: Ultra-lightweight with prompt tuning, Swin Transformer for better hierarchical features, trained on COCO
+- **BLIP-base**: Industry-standard first-gen VLM, VisionEncoderDecoder with ViT+BERT, proven reliability on diverse datasets
+- **GIT-base**: Lightweight VisionEncoderDecoder with ViT+GPT2, excellent speed/quality balance, strong generalization
+- **Swin-Tiny-DistilGPT2**: Experimental VisionEncoderDecoder with Swin+DistilGPT2 - **negative control showing checkpoint quality matters more than architecture**
+
+All three models share the same **VisionEncoderDecoder architecture** (vision encoder → cross-attention → language decoder) which enables reliable operation on 4GB VRAM. None support prompt tuning - all use direct image-to-text generation trained on COCO captions.
+
+**Key Finding**: Despite identical architecture, **BLIP and GIT produce relevant F1 captions** while **Swin-Tiny generates generic COCO descriptions** (baseball, tennis, motorcycles). This demonstrates that model checkpoint training quality and generalization capability are more critical than architectural choices when working with domain-specific datasets. Swin-Tiny is kept in the comparison as experimental evidence of this phenomenon.
 
 ### Quantization Strategy
 
@@ -270,20 +359,22 @@ Results include:
 - **GIT-base**: FP16 (native)
 - **Swin-Tiny-DistilGPT2**: FP16 (no quantization needed, <1GB)
 
-### Tested Models (Memory/Loading Issues)
+### Tested Modern LLM-based VLMs (Failed on 4GB VRAM)
 
-During development, several models were tested but encountered loading or memory issues on GTX 1050 (4GB VRAM):
+During development, several **modern LLM-based multimodal models** were tested but all failed due to hardware limitations on GTX 1050 (4GB VRAM). These represent the newer generation of VLMs with full instruction-following capabilities:
 
-- **MiniCPM-V 2.0** (`openbmb/MiniCPM-Llama3-V-2_5`): Failed to load within VRAM constraints despite 4-bit quantization. Model hung during initialization after ~1 hour of waiting.
+- **Qwen2-VL-2B** (`Qwen/Qwen2-VL-2B-Instruct`) [LLM-based]: Loaded successfully but encountered **CUDA Out of Memory** error during inference. Model attempted to allocate 4.27GB on a 4GB GPU, failing at the 8th image. Architecture: Vision encoder → Qwen2-2B LLM. Would support full natural language instructions if hardware allowed.
 
-- **Moondream2** (`vikhyatk/moondream2`): Memory initialization issues prevented proper loading. Incompatibility with current transformers version.
+- **Phi-3-Vision** (`microsoft/Phi-3-vision-128k-instruct`) [LLM-based]: **Shard loading timeout** after ~16 minutes. Despite 4-bit quantization reducing the 3.8B Phi-3 LLM to ~2.5GB, the loading process failed to complete. Architecture: Vision encoder → Phi-3-mini LLM.
 
-- **Qwen2-VL-2B** (`Qwen/Qwen2-VL-2B-Instruct`): Loaded successfully but encountered CUDA Out of Memory error during inference. Model attempted to allocate 4.27GB on a 4GB GPU, failing at the 8th image. While promising, it exceeds the available VRAM.
+- **InstructBLIP** (`Salesforce/instructblip-vicuna-7b`) [LLM-based]: Model download/shard loading extremely slow. After **~1.5 hours**, shards failed to load completely. Architecture: Q-Former → Vicuna-7B LLM. The 7B LLM size is too large for efficient loading even with 4-bit quantization.
 
-- **InstructBLIP** (`Salesforce/instructblip-vicuna-7b`): Model download/shard loading extremely slow. After ~1.5 hours, shards failed to load completely. The 7B model size appears too large for efficient loading even with 4-bit quantization on limited hardware.
+- **MiniCPM-V 2.0** (`openbmb/MiniCPM-Llama3-V-2_5`) [LLM-based]: Failed to load within VRAM constraints despite 4-bit quantization. Model **hung during initialization after ~1 hour** of waiting. Architecture: Vision encoder → Llama3 LLM.
 
-- **Phi-3-Vision** (`microsoft/Phi-3-vision-128k-instruct`): Shard loading timeout after ~16 minutes. Despite 4-bit quantization reducing the 3.8B model to ~2.5GB, the loading process failed to complete. Model hung during shard loading similar to InstructBLIP.
+- **Moondream2** (`vikhyatk/moondream2`) [LLM-based]: Memory initialization issues prevented proper loading. Incompatibility with current transformers version. Small LLM-based model but implementation issues.
 
-- **ViT2DistilGPT2** (`sachin/vit2distilgpt2`): Ultra-lightweight VisionEncoderDecoder model that loaded successfully but generated empty or single-character captions. The model appears to not be properly fine-tuned for captioning tasks despite its VisionEncoderDecoder architecture. Removed from final model set.
+### Tested First-Gen VLMs (Also Failed)
 
-**Selected Alternatives**: After extensive testing, Swin-Tiny-DistilGPT2 was selected as the prompt-capable model. It's ultra-lightweight (<0.2B parameters), loads instantly, runs in <1GB VRAM, and supports prompt tuning through decoder prefix injection. Combined with BLIP-base and GIT-base, this provides a balanced comparison with two direct captioning models and one prompt-capable model, all working reliably on 4GB VRAM.
+- **ViT2DistilGPT2** (`sachin/vit2distilgpt2`) [VisionEncoderDecoder]: Ultra-lightweight model that loaded successfully but generated **empty or single-character captions**. Despite being the same VisionEncoderDecoder architecture as working models, this checkpoint appears to not be properly fine-tuned for captioning tasks. Removed from final model set.
+
+**Key Takeaway**: All modern LLM-based VLMs (Qwen, Phi, InstructBLIP, MiniCPM) **require >4GB VRAM** even with aggressive quantization. First-gen VisionEncoderDecoder models (BLIP, GIT, Swin-Tiny) are the only viable option for GTX 1050, trading instruction-following capabilities for reliability and speed.
