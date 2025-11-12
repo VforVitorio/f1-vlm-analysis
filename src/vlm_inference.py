@@ -198,10 +198,11 @@ def run_single_model(model_name):
     output_dir = MODEL_RESULTS_PATHS[model_name]
     output_path = Path(output_dir) / GENERATED_CAPTIONS_FILENAME
 
-    # Save results (ensure_output_dir is called internally)
-    utils.save_captions_json(captions, str(output_path))
+    # Save results with incremental filename to avoid overwriting
+    actual_path = utils.save_captions_json(
+        captions, str(output_path), incremental=True)
 
-    print(f"Results saved to: {output_path}")
+    print(f"Results saved to: {actual_path}")
 
     # Cleanup GPU memory (clear_gpu_cache is called internally)
     model.clear_cache()
