@@ -2,7 +2,7 @@
 VLM Inference - Main orchestrator for image captioning
 
 This module handles the complete inference pipeline:
-- CLI argument parsing (--model blip/git-base/vit2distilgpt2/swin-tiny or --all)
+- CLI argument parsing (--model blip/git-base/swin-tiny or --all)
 - Model loading and initialization
 - Dataset processing and caption generation
 - Results saving to JSON format
@@ -10,7 +10,6 @@ This module handles the complete inference pipeline:
 Usage:
     python src/vlm_inference.py --model blip
     python src/vlm_inference.py --model git-base
-    python src/vlm_inference.py --model vit2distilgpt2
     python src/vlm_inference.py --model swin-tiny
     python src/vlm_inference.py --all
 
@@ -26,7 +25,6 @@ from typing import Dict, List
 # Local imports
 from models.blip_model import create_blip_model
 from models.git_base_model import create_git_base_model
-from models.vit2distilgpt2_model import create_vit2distilgpt2_model
 from models.swin_tiny_model import create_swin_tiny_model
 
 import utils
@@ -48,7 +46,7 @@ def create_model(model_name):
     Factory function to create model instance based on name.
 
     Args:
-        model_name: Name of the model ("blip", "git-base", "vit2distilgpt2", "swin-tiny")
+        model_name: Name of the model ("blip", "git-base", "swin-tiny")
     Returns:
         Model instance with generate_caption() method
 
@@ -60,8 +58,6 @@ def create_model(model_name):
         return create_blip_model()
     elif model_name == "git-base":
         return create_git_base_model()
-    elif model_name == "vit2distilgpt2":
-        return create_vit2distilgpt2_model()
     elif model_name == "swin-tiny":
         return create_swin_tiny_model()
     else:

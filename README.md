@@ -1,10 +1,10 @@
 # Practice 3: VLM Image Captioning
 
-Vision-Language Model (VLM) based image captioning system for Formula 1 dataset comparing four ultra-lightweight architectures with prompt tuning support.
+Vision-Language Model (VLM) based image captioning system for Formula 1 dataset comparing three ultra-lightweight architectures.
 
 ## Models Used
 
-This project implements and compares **four VLM architectures** optimized for 4GB VRAM (GTX 1050):
+This project implements and compares **three VLM architectures** optimized for 4GB VRAM (GTX 1050):
 
 ### 1. BLIP-base (Baseline - No Prompts)
 
@@ -25,18 +25,7 @@ This project implements and compares **four VLM architectures** optimized for 4G
 - **Prompts** : ❌ No - Direct captioning only
 - **Note** : Excellent balance between speed and quality
 
-### 3. ViT2DistilGPT2 (Ultra-Lightweight + Prompts) ✨
-
-- **Model** : `sachin/vit2distilgpt2`
-- **Size** : ~0.2B parameters (~200MB)
-- **VRAM** : <1GB (FP16)
-- **Purpose** : Ultra-lightweight VisionEncoderDecoder with prompt tuning support
-- **Architecture** : ViT-base encoder + DistilGPT2 decoder
-- **Speed** : <1 second/image
-- **Prompts** : ✅ Yes - Custom prompts via decoder prefix
-- **Note** : Proven model with 24+ monthly downloads and 7 active Spaces on HF
-
-### 4. Swin-Tiny-DistilGPT2 (Ultra-Lightweight + Prompts) ✨
+### 3. Swin-Tiny-DistilGPT2 (Ultra-Lightweight + Prompts) ✨
 
 - **Model** : `yesidcanoc/image-captioning-swin-tiny-distilgpt2`
 - **Size** : ~0.15B parameters (~150MB)
@@ -61,7 +50,6 @@ practica_3_vlm/
 │   │   ├── __init__.py
 │   │   ├── blip_model.py    # BLIP-base captioner class
 │   │   ├── git_base_model.py  # GIT-base captioner class
-│   │   ├── vit2distilgpt2_model.py  # ViT2DistilGPT2 captioner class
 │   │   └── swin_tiny_model.py   # Swin-Tiny-DistilGPT2 captioner class
 │   ├── vlm_inference.py     # Main orchestrator (handles --model arg)
 │   ├── dataset_loader.py    # Load F1 dataset with categories
@@ -87,9 +75,6 @@ practica_3_vlm/
     │   ├── generated_captions.json
     │   └── metrics.json
     ├── git-base/            # GIT-base results
-    │   ├── generated_captions.json
-    │   └── metrics.json
-    ├── vit2distilgpt2/      # ViT2DistilGPT2 results
     │   ├── generated_captions.json
     │   └── metrics.json
     ├── swin-tiny/           # Swin-Tiny-DistilGPT2 results
@@ -169,7 +154,7 @@ make build
 
 ### 2. Generate Captions with All Models
 
-Run all four VLMs sequentially:
+Run all three VLMs sequentially:
 
 ```bash
 make run-all
@@ -179,10 +164,9 @@ This will:
 
 - Generate captions with BLIP-base
 - Generate captions with GIT-base
-- Generate captions with ViT2DistilGPT2
 - Generate captions with Swin-Tiny-DistilGPT2
 - Save results in separate folders per model
-- Total time: <1.5 minutes for 20 images
+- Total time: <1 minute for 20 images
 
 ### 3. Run Individual Models
 
@@ -191,7 +175,6 @@ Run specific VLMs:
 ```bash
 make run-blip            # BLIP-base only (~30 seconds)
 make run-git-base        # GIT-base only (~20 seconds)
-make run-vit2distilgpt2  # ViT2DistilGPT2 only (<20 seconds)
 make run-swin-tiny       # Swin-Tiny only (<20 seconds)
 ```
 
@@ -242,9 +225,8 @@ Opens a bash shell inside the container for interactive development and debuggin
 | -------------------- | --------- | ------------------------ |
 | BLIP-base            | ~1-2s     | ~30-40s                  |
 | GIT-base             | ~1s       | ~20s                     |
-| ViT2DistilGPT2       | <1s       | <20s                     |
 | Swin-Tiny-DistilGPT2 | <1s       | <20s                     |
-| **Total**            | -         | **<1.5 minutes**         |
+| **Total**            | -         | **<1 minute**            |
 
 ## Evaluation Metrics
 
@@ -280,14 +262,12 @@ Results include:
 
 - **BLIP-base**: Industry-standard baseline, fast, reliable, no prompts
 - **GIT-base**: Lightweight and efficient, excellent speed/quality balance, minimal VRAM usage, no prompts
-- **ViT2DistilGPT2**: Ultra-lightweight with prompt tuning via decoder prefix, proven in production (24+ downloads/month), ViT architecture
 - **Swin-Tiny-DistilGPT2**: Ultra-lightweight with prompt tuning, Swin Transformer for better hierarchical features, trained on COCO
 
 ### Quantization Strategy
 
 - **BLIP-base**: FP16 (native)
 - **GIT-base**: FP16 (native)
-- **ViT2DistilGPT2**: FP16 (no quantization needed, <1GB)
 - **Swin-Tiny-DistilGPT2**: FP16 (no quantization needed, <1GB)
 
 ### Tested Models (Memory/Loading Issues)
@@ -304,4 +284,6 @@ During development, several models were tested but encountered loading or memory
 
 - **Phi-3-Vision** (`microsoft/Phi-3-vision-128k-instruct`): Shard loading timeout after ~16 minutes. Despite 4-bit quantization reducing the 3.8B model to ~2.5GB, the loading process failed to complete. Model hung during shard loading similar to InstructBLIP.
 
-**Selected Alternatives**: After extensive testing, ViT2DistilGPT2 and Swin-Tiny-DistilGPT2 were selected as the prompt-capable models. Both are ultra-lightweight (<0.2B parameters), load instantly, run in <1GB VRAM, and support prompt tuning through decoder prefix injection. Combined with BLIP-base and GIT-base, this provides a balanced comparison with two direct captioning models and two prompt-capable models, all working reliably on 4GB VRAM.
+- **ViT2DistilGPT2** (`sachin/vit2distilgpt2`): Ultra-lightweight VisionEncoderDecoder model that loaded successfully but generated empty or single-character captions. The model appears to not be properly fine-tuned for captioning tasks despite its VisionEncoderDecoder architecture. Removed from final model set.
+
+**Selected Alternatives**: After extensive testing, Swin-Tiny-DistilGPT2 was selected as the prompt-capable model. It's ultra-lightweight (<0.2B parameters), loads instantly, runs in <1GB VRAM, and supports prompt tuning through decoder prefix injection. Combined with BLIP-base and GIT-base, this provides a balanced comparison with two direct captioning models and one prompt-capable model, all working reliably on 4GB VRAM.

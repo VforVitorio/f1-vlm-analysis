@@ -15,12 +15,6 @@ run-git-base:
 		-w /opt/project \
 		$(IMAGE) python3 src/vlm_inference.py --model git-base
 
-run-vit2distilgpt2:
-	docker run --rm --gpus all \
-		-v "$(PWD):/opt/project" \
-		-w /opt/project \
-		$(IMAGE) python3 src/vlm_inference.py --model vit2distilgpt2
-
 run-swin-tiny:
 	docker run --rm --gpus all \
 		-v "$(PWD):/opt/project" \
@@ -44,12 +38,6 @@ evaluate-git-base:
 		-v "$(PWD):/opt/project" \
 		-w /opt/project \
 		$(IMAGE) python3 src/evaluate_captions.py --model git-base
-
-evaluate-vit2distilgpt2:
-	docker run --rm --gpus all \
-		-v "$(PWD):/opt/project" \
-		-w /opt/project \
-		$(IMAGE) python3 src/evaluate_captions.py --model vit2distilgpt2
 
 evaluate-swin-tiny:
 	docker run --rm --gpus all \
