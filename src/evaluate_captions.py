@@ -167,8 +167,8 @@ def calculate_meteor_score(references, predictions):
     for ref_list, pred in zip(references, predictions):
         # METEOR expects single reference, use first one
         # (could be extended to handle multiple references)
-        ref = ref_list[0].lower()
-        pred_lower = pred.lower()
+        ref = ref_list[0].lower().split()
+        pred_lower = pred.lower().split()
 
         score = meteor_score([ref], pred_lower)
         meteor_scores.append(score)
