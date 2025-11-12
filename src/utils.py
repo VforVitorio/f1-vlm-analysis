@@ -28,18 +28,80 @@ DEFAULT_DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 # Caption Management Functions
 # ============================================
 
-def save_captions_json(captions, output_path):
+def get_incremental_filename(base_dir, base_name, extension=".json"):
+    """
+    Generate incremental filename to avoid overwriting existing files.
+
+    Creates filenames in the format:
+    - base_name.extension (if doesn't exist)
+    - base_name_1.extension
+    - base_name_2.extension
+    - base_name_N.extension
+
+    Args:
+        base_dir: Directory where file will be saved (Path or str)
+        base_name: Base filename without extension (e.g., "generated_captions")
+        extension: File extension including dot (default: ".json")
+
+    Returns:
+        Path: Full path with incremental number if needed
+
+    Example:
+        >>> get_incremental_filename("results/blip", "generated_captions")
+        Path("results/blip/generated_captions.json")  # if doesn't exist
+        Path("results/blip/generated_captions_1.json")  # if base exists
+        Path("results/blip/generated_captions_2.json")  # if _1 exists
+    """
+    base_dir = Path(base_dir)
+
+    # Try base filename first
+    output_path = base_dir / f"{base_name}{extension}"
+    if not output_path.exists():
+        return output_path
+
+    # Find next available incremental number
+    iteration = 1
+    while True:
+        output_path = base_dir / f"{base_name}_{iteration}{extension}"
+        if not output_path.exists():
+            return output_path
+        iteration += 1
+
+
+def save_captions_json(captions, output_path, incremental=True):
     """
     Save generated captions from the VLMs to JSON file.
 
     Args:
         captions: Dictionary mapping image filenames to generated captions
-        output_path: Path where to save the JSON file
-    """
-    ensure_output_dir(Path(output_path).parent)
+        output_path: Path where to save the JSON file (str or Path)
+        incremental: If True, creates incremental filenames to avoid overwriting.
+                    If False, overwrites existing file. Default: True
 
+    Returns:
+        Path: Actual path where file was saved (may differ if incremental=True)
+    """
+    output_path = Path(output_path)
+
+    if incremental:
+        # Generate incremental filename
+        base_name = output_path.stem  # filename without extension
+        extension = output_path.suffix  # .json
+        base_dir = output_path.parent
+
+        output_path = get_incremental_filename(base_dir, base_name, extension)
+
+    # Ensure directory exists
+    ensure_output_dir(output_path.parent)
+
+    # Save JSON
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(captions, f, indent=2, ensure_ascii=False)
+
+    print(f"✅ Captions saved to: {output_path}")
+    return output_path
+
+    return output_path
 
 
 def format_captions_for_evaluation(ground_truth_data, generated_captions):
